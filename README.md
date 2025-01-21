@@ -7,7 +7,7 @@
 Установка через composer:
 
 ```bash
-composer require your-vendor/omnipay-unitpay
+composer require starcevpro/omnipay-unitpay
 ```
 
 ## Использование
