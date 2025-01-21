@@ -1,5 +1,5 @@
 {
-  "name": "omnipay/unitpay",
+  "name": "starcevpro/omnipay-unitpay",
   "type": "library",
   "description": "UnitPay gateway for Omnipay payment processing library",
   "version": "1.0.0",
