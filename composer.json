@@ -1,0 +1,63 @@
+{
+  "name": "omnipay/unitpay",
+  "type": "library",
+  "description": "UnitPay gateway for Omnipay payment processing library",
+  "version": "1.0.0",
+  "keywords": [
+    "gateway",
+    "merchant",
+    "omnipay",
+    "pay",
+    "payment",
+    "purchase",
+    "sage pay",
+    "sagepay"
+  ],
+  "homepage": "https://github.com/starcevpro/omnipay-unitpay",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Eugene Starcev",
+      "email": "e@starcev.pro",
+      "homepage": "https://starcev.pro"
+    },
+    {
+      "name": "Omnipay Contributors",
+      "homepage": "https://github.com/thephpleague/omnipay-sagepay/contributors"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Omnipay\\UnitPay\\" : "src/"
+    }
+  },
+  "require": {
+    "php": "^7.3|^8",
+    "omnipay/common": "~3.0"
+  },
+  "require-dev": {
+    "omnipay/tests": "^4.1",
+    "squizlabs/php_codesniffer": "^3",
+    "phpspec/prophecy-phpunit": "^2.0",
+    "http-interop/http-factory-guzzle": "^1.2",
+    "symfony/http-client": "^7.2",
+    "symfony/http-kernel": "^7.2",
+    "guzzlehttp/guzzle": "^7.8",
+    "php-http/guzzle7-adapter": "^1.1"
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "4.0-dev"
+    }
+  },
+  "scripts": {
+    "test": "phpunit",
+    "check-style": "phpcs -p --standard=PSR2 src/",
+    "fix-style": "phpcbf -p --standard=PSR2 src/"
+  },
+  "config": {
+    "allow-plugins": {
+      "php-http/discovery": false
+    }
+  }
+}
