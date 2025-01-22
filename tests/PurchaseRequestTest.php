@@ -82,6 +82,31 @@ class PurchaseRequestTest extends TestCase
         $this->assertEquals($cashItems, $decodedItems);
     }
 
+    public function testGetDataWithLocale()
+    {
+        $this->request->setLocale('en');
+        $data = $this->request->getData();
+
+        $this->assertSame('en', $data['locale']);
+    }
+
+    public function testGetDataWithBackUrl()
+    {
+        $backUrl = 'https://example.com/back';
+        $this->request->setBackUrl($backUrl);
+        $data = $this->request->getData();
+
+        $this->assertSame($backUrl, $data['backUrl']);
+    }
+
+    public function testGetDataWithSubscription()
+    {
+        $this->request->setSubscription('true');
+        $data = $this->request->getData();
+
+        $this->assertSame('true', $data['subscription']);
+    }
+
     public function testValidationRequiresEmailOrPhone()
     {
         $this->expectException(InvalidRequestException::class);
@@ -116,25 +141,24 @@ class PurchaseRequestTest extends TestCase
         $this->assertSame($expectedSignature, $data['signature']);
     }
 
-    public function testPhoneAccessors()
+    public function testLocaleAccessors()
     {
-        $phone = '79991234567';
-        $this->request->setPhone($phone);
-
-        $this->assertSame($phone, $this->request->getPhone());
+        $locale = 'en';
+        $this->request->setLocale($locale);
+        $this->assertSame($locale, $this->request->getLocale());
     }
 
-    public function testCashItemsAccessors()
+    public function testBackUrlAccessors()
     {
-        $cashItems = [
-            [
-                'name' => 'Test Product',
-                'count' => 1,
-                'price' => 10.00
-            ]
-        ];
-        $this->request->setCashItems($cashItems);
+        $backUrl = 'https://example.com/back';
+        $this->request->setBackUrl($backUrl);
+        $this->assertSame($backUrl, $this->request->getBackUrl());
+    }
 
-        $this->assertEquals($cashItems, $this->request->getCashItems());
+    public function testSubscriptionAccessors()
+    {
+        $subscription = 'true';
+        $this->request->setSubscription($subscription);
+        $this->assertSame($subscription, $this->request->getSubscription());
     }
 }

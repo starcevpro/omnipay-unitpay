@@ -39,6 +39,36 @@ class PurchaseRequest extends AbstractUnitPayRequest
         return $this->setParameter('cashItems', $value);
     }
 
+    public function getLocale()
+    {
+        return $this->getParameter('locale');
+    }
+
+    public function setLocale($value): PurchaseRequest
+    {
+        return $this->setParameter('locale', $value);
+    }
+
+    public function getBackUrl()
+    {
+        return $this->getParameter('backUrl');
+    }
+
+    public function setBackUrl($value): PurchaseRequest
+    {
+        return $this->setParameter('backUrl', $value);
+    }
+
+    public function getSubscription()
+    {
+        return $this->getParameter('subscription');
+    }
+
+    public function setSubscription($value): PurchaseRequest
+    {
+        return $this->setParameter('subscription', $value);
+    }
+
     /**
      * @throws InvalidRequestException
      */
@@ -80,6 +110,21 @@ class PurchaseRequest extends AbstractUnitPayRequest
         $cashItems = $this->getCashItems();
         if (!empty($cashItems)) {
             $data['cashItems'] = base64_encode(json_encode($cashItems));
+        }
+
+        $locale = $this->getLocale();
+        if (!empty($locale)) {
+            $data['locale'] = $locale;
+        }
+
+        $backUrl = $this->getBackUrl();
+        if (!empty($backUrl)) {
+            $data['backUrl'] = $backUrl;
+        }
+
+        $subscription = $this->getSubscription();
+        if (!empty($subscription)) {
+            $data['subscription'] = $subscription;
         }
 
         $data['signature'] = $this->generateSignature($data);
