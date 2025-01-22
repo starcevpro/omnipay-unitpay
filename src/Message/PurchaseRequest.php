@@ -19,6 +19,26 @@ class PurchaseRequest extends AbstractUnitPayRequest
         return $this->setParameter('email', $value);
     }
 
+    public function getPhone()
+    {
+        return $this->getParameter('phone');
+    }
+
+    public function setPhone($value): PurchaseRequest
+    {
+        return $this->setParameter('phone', $value);
+    }
+
+    public function getCashItems()
+    {
+        return $this->getParameter('cashItems');
+    }
+
+    public function setCashItems($value): PurchaseRequest
+    {
+        return $this->setParameter('cashItems', $value);
+    }
+
     /**
      * @throws InvalidRequestException
      */
@@ -30,6 +50,11 @@ class PurchaseRequest extends AbstractUnitPayRequest
             'transactionId',
             'description'
         );
+
+        // Validate that either email or phone is present
+        if (empty($this->getEmail()) && empty($this->getPhone())) {
+            throw new InvalidRequestException("Either email or phone is required");
+        }
 
         $data = [
             'sum' => $this->getAmount(),
@@ -47,6 +72,16 @@ class PurchaseRequest extends AbstractUnitPayRequest
             $data['customerEmail'] = $email;
         }
 
+        $phone = $this->getPhone();
+        if (!empty($phone)) {
+            $data['customerPhone'] = $phone;
+        }
+
+        $cashItems = $this->getCashItems();
+        if (!empty($cashItems)) {
+            $data['cashItems'] = base64_encode(json_encode($cashItems));
+        }
+
         $data['signature'] = $this->generateSignature($data);
 
         return $data;
@@ -54,7 +89,6 @@ class PurchaseRequest extends AbstractUnitPayRequest
 
     protected function generateSignature($data): string
     {
-        // Всегда используем боевой ключ для подписи
         $params = [
             $data['account'],
             $data['currency'],

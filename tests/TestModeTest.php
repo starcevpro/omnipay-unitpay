@@ -27,7 +27,8 @@ class TestModeTest extends TestCase
             'amount' => '10.00',
             'currency' => 'RUB',
             'transactionId' => '12345',
-            'description' => 'Test Purchase'
+            'description' => 'Test Purchase',
+            'email' => 'test@example.com',
         ]);
 
         $data = $request->getData();
@@ -53,7 +54,8 @@ class TestModeTest extends TestCase
             'amount' => '10.00',
             'currency' => 'RUB',
             'transactionId' => '12345',
-            'description' => 'Test Purchase'
+            'description' => 'Test Purchase',
+            'phone' => '79991234567'
         ]);
 
         $data = $request->getData();

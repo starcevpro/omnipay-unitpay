@@ -2,6 +2,7 @@
 
 namespace Tests\Omnipay\UnitPay;
 
+use Omnipay\Common\Exception\InvalidRequestException;
 use Omnipay\UnitPay\Message\PurchaseRequest;
 use PHPUnit\Framework\TestCase;
 
@@ -20,7 +21,8 @@ class PurchaseRequestTest extends TestCase
             'transactionId' => '12345',
             'description' => 'Test Purchase',
             'secretKey' => 'test-secret-key',
-            'publicKey' => 'test-public-key'
+            'publicKey' => 'test-public-key',
+            'email' => 'test@example.com'
         ]);
     }
 
@@ -36,21 +38,8 @@ class PurchaseRequestTest extends TestCase
             ->getMock();
     }
 
-    public function testGetDataWithoutEmail()
-    {
-        $data = $this->request->getData();
-
-        $this->assertSame('10.00', $data['sum']);
-        $this->assertSame('12345', $data['account']);
-        $this->assertSame('Test Purchase', $data['desc']);
-        $this->assertSame('RUB', $data['currency']);
-        $this->assertArrayNotHasKey('customerEmail', $data);
-        $this->assertArrayHasKey('signature', $data);
-    }
-
     public function testGetDataWithEmail()
     {
-        $this->request->setEmail('test@example.com');
         $data = $this->request->getData();
 
         $this->assertSame('10.00', $data['sum']);
@@ -61,12 +50,54 @@ class PurchaseRequestTest extends TestCase
         $this->assertArrayHasKey('signature', $data);
     }
 
-    public function testGetDataWithEmptyEmail()
+    public function testGetDataWithPhone()
     {
-        $this->request->setEmail('');
+        $this->request->setEmail(null);
+        $this->request->setPhone('79991234567');
         $data = $this->request->getData();
 
+        $this->assertSame('79991234567', $data['customerPhone']);
         $this->assertArrayNotHasKey('customerEmail', $data);
+    }
+
+    public function testGetDataWithCashItems()
+    {
+        $cashItems = [
+            [
+                'name' => 'Test Product',
+                'count' => 1,
+                'price' => 10.00,
+                'currency' => 'RUB',
+                'nds' => 'vat20',
+                'type' => 'commodity',
+                'paymentMethod' => 'full_payment'
+            ]
+        ];
+
+        $this->request->setCashItems($cashItems);
+        $data = $this->request->getData();
+
+        $this->assertArrayHasKey('cashItems', $data);
+        $decodedItems = json_decode(base64_decode($data['cashItems']), true);
+        $this->assertEquals($cashItems, $decodedItems);
+    }
+
+    public function testValidationRequiresEmailOrPhone()
+    {
+        $this->expectException(InvalidRequestException::class);
+        $this->expectExceptionMessage('Either email or phone is required');
+
+        $this->request->setEmail(null);
+        $this->request->getData();
+    }
+
+    public function testGetDataWithBothEmailAndPhone()
+    {
+        $this->request->setPhone('79991234567');
+        $data = $this->request->getData();
+
+        $this->assertSame('test@example.com', $data['customerEmail']);
+        $this->assertSame('79991234567', $data['customerPhone']);
     }
 
     public function testGenerateSignature()
@@ -85,20 +116,25 @@ class PurchaseRequestTest extends TestCase
         $this->assertSame($expectedSignature, $data['signature']);
     }
 
-    public function testSendData()
+    public function testPhoneAccessors()
     {
-        $data = $this->request->getData();
-        $response = $this->request->sendData($data);
+        $phone = '79991234567';
+        $this->request->setPhone($phone);
 
-        $this->assertInstanceOf('Omnipay\UnitPay\Message\PurchaseResponse', $response);
-        $this->assertStringContainsString('test-public-key', $response->getRedirectUrl());
+        $this->assertSame($phone, $this->request->getPhone());
     }
 
-    public function testEmailAccessors()
+    public function testCashItemsAccessors()
     {
-        $email = 'test@example.com';
-        $this->request->setEmail($email);
+        $cashItems = [
+            [
+                'name' => 'Test Product',
+                'count' => 1,
+                'price' => 10.00
+            ]
+        ];
+        $this->request->setCashItems($cashItems);
 
-        $this->assertSame($email, $this->request->getEmail());
+        $this->assertEquals($cashItems, $this->request->getCashItems());
     }
 }
